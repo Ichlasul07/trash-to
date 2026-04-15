@@ -84,7 +84,7 @@ app.post("/report", upload.single("foto"), async (req, res) => {
   });
 
 
-app.use(cors());
+
 
 /* =========================
    START SERVER
