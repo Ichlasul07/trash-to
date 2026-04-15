@@ -107,3 +107,71 @@ app.post("/report", upload.single("foto"), async (req, res) => {
 app.listen(3000, "0.0.0.0", () => {
   console.log("🚀 Server jalan di port 3000");
 });
+
+app.put("/reports/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      await pool.query(
+        "UPDATE reports SET status = 'done' WHERE id = $1",
+        [id]
+      );
+  
+      res.json({ message: "Status berhasil diupdate" });
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Gagal update status" });
+    }
+  });
+
+  app.delete("/reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      await pool.query("DELETE FROM reports WHERE id = $1", [id]);
+  
+      res.json({ message: "Data berhasil dihapus" });
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Gagal hapus data" });
+    }
+  });
+
+  app.put("/reports/:id", upload.single("foto"), async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      let fotoUrl = null;
+  
+      if (req.file) {
+        const uploadResult = await s3.upload({
+          Bucket: "cleancity-bucket-uts",
+          Key: Date.now() + "-" + req.file.originalname,
+          Body: req.file.buffer,
+          ACL: "public-read"
+        }).promise();
+  
+        fotoUrl = uploadResult.Location;
+      }
+  
+      if (fotoUrl) {
+        await pool.query(
+          "UPDATE reports SET lokasi=$1, deskripsi=$2, foto=$3 WHERE id=$4",
+          [req.body.lokasi, req.body.deskripsi, fotoUrl, id]
+        );
+      } else {
+        await pool.query(
+          "UPDATE reports SET lokasi=$1, deskripsi=$2 WHERE id=$3",
+          [req.body.lokasi, req.body.deskripsi, id]
+        );
+      }
+  
+      res.json({ message: "Data berhasil diupdate" });
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Gagal update data" });
+    }
+  });
