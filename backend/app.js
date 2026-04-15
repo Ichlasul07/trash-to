@@ -15,9 +15,9 @@ const upload = multer({ storage: multer.memoryStorage() });
    AWS S3 CONFIG
 ========================= */
 const s3 = new AWS.S3({
-    region: "ap-southeast-1",
-    accessKeyId: process.env.AKIAQTMY5GVA6KOBXJ42,
-    secretAccessKey: process.env.L1nHkgyzXfueeG4LnGg19VCEsHlTtn0oTnGXLY/r
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   });
 
 /* =========================
@@ -86,6 +86,9 @@ app.post("/report", upload.single("foto"), async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
+const cors = require("cors");
+app.use(cors());
 
 /* =========================
    START SERVER
