@@ -83,7 +83,7 @@ app.post("/report", upload.single("foto"), async (req, res) => {
     }
   });
 
-const cors = require("cors");
+
 app.use(cors());
 
 /* =========================
