@@ -52,3 +52,7 @@ app.post("/report", upload.single("foto"), async (req, res) => {
 app.listen(3000, "0.0.0.0", () => {
   console.log("Server jalan");
 });
+
+app.get("/", (req, res) => {
+    res.send("🚀 CleanCity API is running!");
+  });
