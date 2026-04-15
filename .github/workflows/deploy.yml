@@ -21,14 +21,13 @@ jobs:
           script: |
             cd ~/trash-to
 
-            # stop semua container di port 3000
-            docker ps -q --filter "publish=3000" | xargs -r docker stop
-            docker ps -aq --filter "publish=3000" | xargs -r docker rm
+            # hapus semua container lama
+            docker ps -aq | xargs -r docker rm -f
 
-            # build ulang
-            docker build --no-cache -t cleancity .
+            # build image
+            docker build -t cleancity .
 
-            # run baru
+            # run container baru
             docker run -d -p 3000:3000 \
             --name app \
             -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
