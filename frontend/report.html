@@ -1,8 +1,124 @@
-<form id="reportForm">
-    <input type="text" placeholder="Lokasi" id="lokasi" required />
-    <textarea placeholder="Deskripsi" id="deskripsi"></textarea>
-    <input type="file" id="foto" />
-    <button type="submit">Kirim</button>
-  </form>
-  
-  <script src="script.js"></script>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>CleanCity - Semua Laporan</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c7a7b;
+    }
+
+    .top-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      background: #2c7a7b;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background: #225e5f;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 12px;
+      color: gray;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>📋 Semua Laporan CleanCity</h1>
+
+<div class="top-bar">
+  <button class="btn" onclick="loadReports()">🔄 Refresh</button>
+  <a href="index.html">
+    <button class="btn">⬅️ Kembali</button>
+  </a>
+</div>
+
+<div id="loading" class="loading">Loading data...</div>
+
+<div class="grid" id="list"></div>
+
+<script>
+  async function loadReports() {
+    const loading = document.getElementById("loading");
+    const container = document.getElementById("list");
+
+    loading.style.display = "block";
+    container.innerHTML = "";
+
+    try {
+      const res = await fetch("http://13.221.232.217:3000/reports");
+      const data = await res.json();
+
+      loading.style.display = "none";
+
+      if (data.length === 0) {
+        container.innerHTML = "<p>Tidak ada laporan</p>";
+        return;
+      }
+
+      container.innerHTML = data.map(item => `
+        <div class="card">
+          <b>📍 ${item.lokasi}</b>
+          <p>${item.deskripsi}</p>
+          <img src="${item.foto}" />
+          <div class="status">Status: ${item.status}</div>
+        </div>
+      `).join("");
+
+    } catch (err) {
+      loading.innerText = "Gagal load data";
+      console.error(err);
+    }
+  }
+
+  loadReports();
+</script>
+
+</body>
+</html>
