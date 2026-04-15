@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: SSH to EC2
         uses: appleboy/ssh-action@master
@@ -19,9 +19,20 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
+            set -e
+
+            if [ ! -d "clean-city/.git" ]; then
+              rm -rf clean-city
+              git clone https://github.com/Ichlasul07/REPO.git clean-city
+            fi
+
             cd clean-city
-            git pull
+
+            git pull origin main || true
+
             docker build -t cleancity .
+
             docker stop app || true
             docker rm app || true
+
             docker run -d -p 3000:3000 --name app cleancity
