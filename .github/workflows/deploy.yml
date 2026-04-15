@@ -33,4 +33,5 @@ jobs:
             docker stop app || true
             docker rm app || true
 
-            docker run -d -p 3000:3000 --name app cleancity
+            docker run -d -p 3000:3000 --name app cleancity || \
+            docker run -d -p 3001:3000 --name app cleancity
