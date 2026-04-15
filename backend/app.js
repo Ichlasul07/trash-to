@@ -15,8 +15,10 @@ const upload = multer({ storage: multer.memoryStorage() });
    AWS S3 CONFIG
 ========================= */
 const s3 = new AWS.S3({
-  region: "ap-southeast-1"
-});
+    region: "ap-southeast-1",
+    accessKeyId: process.env.AKIAQTMY5GVA6KOBXJ42,
+    secretAccessKey: process.env.L1nHkgyzXfueeG4LnGg19VCEsHlTtn0oTnGXLY/r
+  });
 
 /* =========================
    POSTGRES CONFIG
@@ -43,6 +45,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
+
 /* =========================
    UPLOAD REPORT + S3 + DB
 ========================= */
@@ -50,8 +53,8 @@ app.post("/report", upload.single("foto"), async (req, res) => {
   try {
     // validasi file
     if (!req.file) {
-      return res.status(400).send("File tidak ditemukan");
-    }
+        return res.status(400).send("File tidak ada / salah upload");
+      }
 
     // upload ke S3
     const params = {
@@ -79,8 +82,8 @@ app.post("/report", upload.single("foto"), async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    console.log("ERROR DETAIL:", err);
+    res.status(500).send(err.message);
   }
 });
 

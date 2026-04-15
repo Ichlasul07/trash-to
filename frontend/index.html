@@ -1,2 +1,123 @@
-<h1>CleanCity</h1>
-<a href="report.html">Lapor Sampah</a>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CleanCity - Laporan Sampah</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 60px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c7a7b;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2c7a7b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #225e5f;
+    }
+
+    .result {
+      margin-top: 15px;
+      padding: 10px;
+      background: #e6fffa;
+      border-left: 5px solid #2c7a7b;
+      display: none;
+    }
+
+    img {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🌱 CleanCity Report</h1>
+
+  <form id="form">
+    <input type="text" name="lokasi" placeholder="Lokasi (contoh: Jakarta)" required />
+
+    <textarea name="deskripsi" placeholder="Deskripsi laporan..." required></textarea>
+
+    <input type="file" name="foto" accept="image/*" required />
+
+    <button type="submit">Kirim Laporan</button>
+  </form>
+
+  <div class="result" id="result">
+    <p id="msg"></p>
+    <img id="img" />
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById("form");
+  const result = document.getElementById("result");
+  const msg = document.getElementById("msg");
+  const img = document.getElementById("img");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("http://13.221.232.217:3000/report", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      msg.innerText = data.message;
+      img.src = data.fileUrl;
+
+      result.style.display = "block";
+
+    } catch (err) {
+      alert("Gagal mengirim laporan");
+      console.log(err);
+    }
+  });
+</script>
+
+</body>
+</html>
