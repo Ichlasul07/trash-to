@@ -50,42 +50,33 @@ app.get("/health", (req, res) => {
    UPLOAD REPORT + S3 + DB
 ========================= */
 app.post("/report", upload.single("foto"), async (req, res) => {
-  try {
-    // validasi file
-    if (!req.file) {
-        return res.status(400).send("File tidak ada / salah upload");
-      }
-
-    // upload ke S3
-    const params = {
-      Bucket: "cleancity-bucket-uts",
-      Key: Date.now() + "-" + req.file.originalname,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype,
-    };
-
-    const uploadResult = await s3.upload(params).promise();
-
-    // simpan ke postgres
-    await pool.query(
-      "INSERT INTO reports (lokasi, deskripsi, foto) VALUES ($1, $2, $3)",
-      [
-        req.body.lokasi,
-        req.body.deskripsi,
-        uploadResult.Location
-      ]
-    );
-
-    res.json({
-      message: "Data berhasil disimpan",
-      fileUrl: uploadResult.Location
-    });
-
-  } catch (err) {
-    console.log("ERROR DETAIL:", err);
-    res.status(500).send(err.message);
-  }
-});
+    try {
+      const params = {
+        Bucket: "cleancity-bucket-uts",
+        Key: Date.now() + "-" + req.file.originalname,
+        Body: req.file.buffer,
+      };
+  
+      const uploadResult = await s3.upload(params).promise();
+  
+      await pool.query(
+        "INSERT INTO reports (lokasi, deskripsi, foto) VALUES ($1, $2, $3)",
+        [req.body.lokasi, req.body.deskripsi, uploadResult.Location]
+      );
+  
+      return res.json({
+        message: "Data berhasil disimpan",
+        fileUrl: uploadResult.Location
+      });
+  
+    } catch (err) {
+      console.error("ERROR REPORT:", err);
+      return res.status(500).json({
+        message: "Upload gagal",
+        error: err.message
+      });
+    }
+  });
 
 const cors = require("cors");
 app.use(cors());
