@@ -52,6 +52,16 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
+app.get("/reports", async (req, res) => {
+    try {
+      const result = await pool.query("SELECT * FROM reports ORDER BY id DESC");
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Gagal ambil data" });
+    }
+  });
+
 /* =========================
    UPLOAD REPORT + S3 + DB
 ========================= */
