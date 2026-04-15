@@ -23,12 +23,10 @@ jobs:
 
             if [ ! -d "clean-city/.git" ]; then
               rm -rf clean-city
-              git clone https://github.com/Ichlasul07/REPO.git clean-city
+              git clone https://github.com/Ichlasul07/trash-to.git clean-city
             fi
 
             cd clean-city
-
-            git pull origin main || true
 
             docker build -t cleancity .
 
