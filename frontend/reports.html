@@ -103,21 +103,69 @@
       }
 
       container.innerHTML = data.map(item => `
-        <div class="card">
-          <b>📍 ${item.lokasi}</b>
-          <p>${item.deskripsi}</p>
-          <img src="${item.foto}" />
-          <div class="status">Status: ${item.status}</div>
-        </div>
-      `).join("");
+  <div class="card">
+    <b>📍 ${item.lokasi}</b>
+    <p>${item.deskripsi}</p>
+    <img src="${item.foto}" />
+
+    <div class="status">Status: ${item.status}</div>
+
+    <div style="margin-top:10px;">
+      ${item.status === "pending" ? `
+        <button onclick="markDone(${item.id})">✅ Done</button>
+        <button onclick="editReport(${item.id}, '${item.lokasi}', '${item.deskripsi}')">✏️ Edit</button>
+      ` : ""}
+
+      <button onclick="deleteReport(${item.id})">🗑 Delete</button>
+    </div>
+  </div>
+`).join("");
 
     } catch (err) {
       loading.innerText = "Gagal load data";
       console.error(err);
     }
+
+    
   }
 
   loadReports();
+
+  async function markDone(id) {
+  await fetch(`http://13.221.232.217:3000/reports/${id}/status`, {
+    method: "PUT"
+  });
+
+  loadReports();
+}
+
+async function deleteReport(id) {
+  if (!confirm("Yakin mau hapus?")) return;
+
+  await fetch(`http://13.221.232.217:3000/reports/${id}`, {
+    method: "DELETE"
+  });
+
+  loadReports();
+}
+
+async function editReport(id, lokasi, deskripsi) {
+  const newLokasi = prompt("Edit lokasi:", lokasi);
+  const newDeskripsi = prompt("Edit deskripsi:", deskripsi);
+
+  if (!newLokasi || !newDeskripsi) return;
+
+  const formData = new FormData();
+  formData.append("lokasi", newLokasi);
+  formData.append("deskripsi", newDeskripsi);
+
+  await fetch(`http://13.221.232.217:3000/reports/${id}`, {
+    method: "PUT",
+    body: formData
+  });
+
+  loadReports();
+}
 </script>
 
 </body>
